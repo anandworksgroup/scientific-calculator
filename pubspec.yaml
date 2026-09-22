@@ -1,0 +1,40 @@
+name: advanced_calculator
+description: "Advanced Calculator — offline scientific, graphing, CAS and engineering calculator."
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.8.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  # Pure-Dart math engine (parser, exact/high-precision arithmetic, CAS,
+  # calculus, linear algebra, statistics, graph sampling, units, content).
+  math_engine:
+    path: packages/math_engine
+  flutter_riverpod: ^3.3.2
+  go_router: ^17.0.0
+  sqflite: ^2.4.2
+  path: ^1.9.1
+  path_provider: ^2.1.5
+  shared_preferences: ^2.5.3
+  flutter_math_fork: ^0.7.4
+  share_plus: ^12.0.2
+  file_picker: ^11.0.3
+  in_app_purchase: ^3.2.3
+  flutter_secure_storage: ^10.3.4
+  intl: ^0.20.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+  sqflite_common_ffi: ^2.3.6
+
+flutter:
+  generate: true
+  uses-material-design: true

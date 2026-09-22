@@ -1,0 +1,13 @@
+name: math_engine
+description: Pure-Dart mathematics engine (parser, exact/high-precision arithmetic, CAS, calculus, linear algebra, statistics, graphing) for Advanced Calculator.
+version: 1.0.0
+publish_to: none
+
+environment:
+  sdk: ^3.8.0
+
+dependencies:
+
+dev_dependencies:
+  lints: ^5.0.0
+  test: ^1.24.0
