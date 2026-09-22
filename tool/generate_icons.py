@@ -138,6 +138,14 @@ def main():
 
     # In-app copy of the icon (onboarding, About).
     save(full_icon(512), os.path.join(ROOT, "assets", "icon", "app_icon.png"))
+
+    # Full-resolution masters for documentation and store listings.
+    docs = os.path.join(ROOT, "docs", "branding")
+    save(full_icon(1024), os.path.join(docs, "app_icon_1024_rounded.png"))
+    full_icon(1024, rounded=False).convert("RGB").save(os.path.join(docs, "app_icon_1024_square.png"))
+    save(full_icon(512, rounded=False).convert("RGB"), os.path.join(docs, "play_store_icon_512.png"))
+    save(foreground(1024), os.path.join(docs, "adaptive_foreground_1024.png"))
+    save(gradient(1024), os.path.join(docs, "adaptive_background_1024.png"))
     print("icons generated")
 
 
