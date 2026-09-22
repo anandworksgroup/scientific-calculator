@@ -136,7 +136,14 @@ class EditorLatexRenderer {
         return r'\,\mathrm{C}\,';
       case 'nPr':
         return r'\,\mathrm{P}\,';
-      case '{' || '}' || '#' || '&' || '_' || r'$' || '~' || '^' || '\\':
+      case '^':
+        // A lone caret (exponent not typed yet).
+        return r'{}^{\wedge}';
+      case '~':
+        return r'\sim ';
+      case '\\':
+        return r'\backslash ';
+      case '{' || '}' || '#' || '&' || '_' || r'$':
         return '\\$s';
     }
     return s;

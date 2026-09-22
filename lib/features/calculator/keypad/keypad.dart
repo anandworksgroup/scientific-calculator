@@ -131,7 +131,9 @@ class CalcKeyButton extends ConsumerWidget {
               fontWeight: spec.style == KeyStyle.number || spec.style == KeyStyle.equals ? FontWeight.w500 : FontWeight.w400,
             );
             final label = alt ?? KeyAlt(spec.label, spec.action, spec.semantic, tex: spec.tex);
-            Widget main = label.tex
+            Widget main = alt == null && spec.icon != null
+                ? Icon(spec.icon, size: base * 1.25, color: mainStyle.color)
+                : label.tex
                 ? FittedBox(fit: BoxFit.scaleDown, child: MathView(label.label, style: mainStyle, fallback: label.label))
                 : FittedBox(fit: BoxFit.scaleDown, child: Text(label.label, style: mainStyle, maxLines: 1));
             if (!showSecondary || box.maxHeight < 34 || (spec.shift == null && spec.alpha == null) || alt != null) {

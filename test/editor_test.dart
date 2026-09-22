@@ -66,8 +66,23 @@ void main() {
 
   test('tokenizeText round-trips function names', () {
     final toks = ExpressionEditor.tokenizeText('sin(30)+sqrt(16)');
-    expect(toks.where((t) => t.kind == TokKind.func).map((t) => t.text), ['sin', 'sqrt']);
+    expect(toks.where((t) => t.kind == TokKind.func).map((t) => t.text), ['sin']);
+    expect(toks.where((t) => t.kind == TokKind.open).single.template, TemplateType.sqrt);
     expect(eval(ExpressionEditor(toks)), '9/2');
+  });
+
+  test('typed calculus functions become templates and still evaluate', () {
+    final toks = ExpressionEditor.tokenizeText('integral(x^2,x,0,1)+sum(x,x,1,100)');
+    expect(toks.where((t) => t.kind == TokKind.open).map((t) => t.template), [TemplateType.integral, TemplateType.pow, TemplateType.sum]);
+    expect(eval(ExpressionEditor(toks)), '15151/3');
+    // Other bound variables stay as plain functions.
+    expect(ExpressionEditor.tokenizeText('sum(k,k,1,5)').first.kind, TokKind.func);
+  });
+
+  test('typed exponents become power templates', () {
+    final toks = ExpressionEditor.tokenizeText('x^2-5x+6=0');
+    expect(toks.where((t) => t.kind == TokKind.open).single.template, TemplateType.pow);
+    expect(eval(ExpressionEditor(ExpressionEditor.tokenizeText('2^(3+1)-2^-1'))), '31/2');
   });
 
   test('serialization validates structure', () {

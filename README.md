@@ -6,6 +6,30 @@ Offline-first scientific, graphing and algebra calculator for Android and iOS,
 built with Flutter. No account, no network access needed for any calculation,
 and no analytics, crash reporting or ads.
 
+## Screenshots
+
+Real screens rendered from the app itself (`docs/screenshots/`).
+
+| Calculator | Fractions | Equation in calculator | Scientific |
+|---|---|---|---|
+| <img src="docs/screenshots/01_calculator.png" width="200"> | <img src="docs/screenshots/02_fractions.png" width="200"> | <img src="docs/screenshots/03_calculator_equation.png" width="200"> | <img src="docs/screenshots/04_scientific.png" width="200"> |
+| **Graph** | **Solve** | **Equation solver (steps)** | **Tools** |
+| <img src="docs/screenshots/05_graph.png" width="200"> | <img src="docs/screenshots/06_solve.png" width="200"> | <img src="docs/screenshots/07_equation_solver.png" width="200"> | <img src="docs/screenshots/08_tools.png" width="200"> |
+| **Matrix** | **Unit converter** | **Formula** | **Programmer** |
+| <img src="docs/screenshots/09_matrix.png" width="200"> | <img src="docs/screenshots/10_converter.png" width="200"> | <img src="docs/screenshots/11_formula.png" width="200"> | <img src="docs/screenshots/12_programmer.png" width="200"> |
+| **Statistics** | **Constants** | **History** | **Dark theme** |
+| <img src="docs/screenshots/13_statistics.png" width="200"> | <img src="docs/screenshots/14_constants.png" width="200"> | <img src="docs/screenshots/15_history.png" width="200"> | <img src="docs/screenshots/16_calculator_dark.png" width="200"> |
+
+**Tablet layout**
+
+<img src="docs/screenshots/17_tablet.png" width="820">
+
+Regenerate them with:
+
+```bash
+SCREENSHOTS=1 flutter test test/screenshots/generate_screenshots_test.dart
+```
+
 ## Layout
 
 ```

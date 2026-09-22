@@ -26,6 +26,13 @@ void main() {
   test('editor text tokens', () {
     final e = ExpressionEditor(ExpressionEditor.tokenizeText('sin(30)×2÷3-4%+5!+Ans+@c+π+e+∞+2ᴇ5+x°+nCr'));
     expectParses(r.render(e.tokens, 3));
+    // Typed exponents, a trailing caret and every pasted structure.
+    for (final s in ['x^2-5x+6=0', 'x^-1+2^(n+1)', '3^', 'integral(x^2,x,0,1)+sum(x,x,1,100)', 'sqrt(abs(x))+cbrt(8)', '{a}_#&~']) {
+      final t = ExpressionEditor(ExpressionEditor.tokenizeText(s));
+      for (var c = 0; c <= t.tokens.length; c++) {
+        expectParses(r.render(t.tokens, c));
+      }
+    }
     const selected = EditorLatexRenderer(cursorColor: '#000000', placeholderColor: '#999999', selectionColor: '#e0e0ff');
     expectParses(selected.render(e.tokens, 0));
   });

@@ -1,3 +1,6 @@
+import 'package:flutter/widgets.dart' show IconData;
+import 'package:flutter/material.dart' show Icons;
+
 import '../../../l10n/generated/app_localizations.dart';
 import '../editor/expression_editor.dart';
 
@@ -89,6 +92,7 @@ class CalcKey {
     this.alpha,
     this.longPress = const [],
     this.flex = 1,
+    this.icon,
   });
 
   final String id;
@@ -103,6 +107,9 @@ class CalcKey {
   final KeyAlt? alpha;
   final List<KeyAlt> longPress;
   final int flex;
+
+  /// Material icon drawn instead of [label] (cursor and menu keys).
+  final IconData? icon;
 }
 
 /// Key definitions shared by all layouts.
@@ -125,8 +132,8 @@ class CalcKeySet {
 
   late final shift = CalcKey(id: 'shift', label: 'SHIFT', action: const Command(CalcCommand.shift), semantic: l.keyShift, style: KeyStyle.modifier, tex: false);
   late final alpha = CalcKey(id: 'alpha', label: 'ALPHA', action: const Command(CalcCommand.alpha), semantic: l.keyAlpha, style: KeyStyle.modifier, tex: false);
-  late final left = CalcKey(id: 'left', label: '◀', action: const Command(CalcCommand.left), semantic: l.calcCursorLeft, style: KeyStyle.modifier, tex: false);
-  late final right = CalcKey(id: 'right', label: '▶', action: const Command(CalcCommand.right), semantic: l.calcCursorRight, style: KeyStyle.modifier, tex: false);
+  late final left = CalcKey(id: 'left', label: '<', icon: Icons.chevron_left, action: const Command(CalcCommand.left), semantic: l.calcCursorLeft, style: KeyStyle.modifier, tex: false);
+  late final right = CalcKey(id: 'right', label: '>', icon: Icons.chevron_right, action: const Command(CalcCommand.right), semantic: l.calcCursorRight, style: KeyStyle.modifier, tex: false);
   late final sd = CalcKey(
     id: 'sd',
     label: r'S\Leftrightarrow D',
@@ -135,7 +142,7 @@ class CalcKeySet {
     style: KeyStyle.modifier,
     shift: KeyAlt(r'\approx', const Command(CalcCommand.approx), l.calcDecimalForm),
   );
-  late final menu = CalcKey(id: 'menu', label: '⋯', action: const Command(CalcCommand.menu), semantic: l.calcModeMenu, style: KeyStyle.modifier, tex: false);
+  late final menu = CalcKey(id: 'menu', label: '...', icon: Icons.more_horiz, action: const Command(CalcCommand.menu), semantic: l.calcModeMenu, style: KeyStyle.modifier, tex: false);
 
   late final frac = CalcKey(
     id: 'frac',

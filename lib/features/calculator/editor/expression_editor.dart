@@ -195,7 +195,23 @@ class ExpressionEditor {
   void insertText(String text) {
     _deleteSelection();
     _snapshot();
-    _insertAll(tokenizeText(text));
+    _insertAll(_renumber(tokenizeText(text)));
+  }
+
+  /// Gives structures in [toks] fresh group ids from this editor.
+  List<EdToken> _renumber(List<EdToken> toks) {
+    final map = <int, int>{};
+    return [
+      for (final t in toks)
+        if (!t.isStructural)
+          t
+        else
+          switch (t.kind) {
+            TokKind.open => EdToken.open(t.template!, map.putIfAbsent(t.group, () => _nextGroup++)),
+            TokKind.sep => EdToken.sep(t.template!, map[t.group] ?? t.group, t.slot),
+            _ => EdToken.close(t.template!, map[t.group] ?? t.group),
+          },
+    ];
   }
 
   /// Inserts a single atomic token (e.g. `Ans`, `@c`, `nCr`).
@@ -365,6 +381,40 @@ class ExpressionEditor {
     return stack.isEmpty;
   }
 
+  /// Group ids for templates created while tokenizing text; kept far from
+  /// the editor's own small ids (setTokens recomputes the next id anyway).
+  static int _tokenizeGroup = 1 << 20;
+
+  /// Splits a function argument list at top-level commas.
+  static List<String> _splitArgs(String s) {
+    final out = <String>[];
+    var depth = 0, start = 0;
+    for (var k = 0; k < s.length; k++) {
+      final c = s[k];
+      if (c == '(' || c == '[') depth++;
+      if (c == ')' || c == ']') depth--;
+      if (c == ',' && depth == 0) {
+        out.add(s.substring(start, k));
+        start = k + 1;
+      }
+    }
+    out.add(s.substring(start));
+    return out;
+  }
+
+  /// Index of the ')' matching the '(' at [open], or -1.
+  static int _matchingParen(String s, int open) {
+    var depth = 0;
+    for (var k = open; k < s.length; k++) {
+      if (s[k] == '(') depth++;
+      if (s[k] == ')') {
+        depth--;
+        if (depth == 0) return k;
+      }
+    }
+    return -1;
+  }
+
   /// Converts plain text into editor tokens (paste, history, formulas).
   static List<EdToken> tokenizeText(String text) {
     final out = <EdToken>[];
@@ -392,6 +442,52 @@ class ExpressionEditor {
         final word = text.substring(i, j);
         final followedByParen = j < text.length && text[j] == '(';
         final fname = functionAliases[word] ?? word;
+        // sqrt(…), cbrt(…), abs(…) become textbook templates when their
+        // argument is a single balanced group.
+        const templated = {'sqrt': TemplateType.sqrt, 'cbrt': TemplateType.root, 'abs': TemplateType.abs};
+        // integral(f,x,a,b), sum/prod(f,x,a,b), deriv(f,x,a), lim(f,x,a)
+        // become ∫ Σ Π d/dx lim templates when the bound variable is x.
+        const calculus = {'integral': TemplateType.integral, 'sum': TemplateType.sum, 'prod': TemplateType.prod, 'deriv': TemplateType.deriv, 'lim': TemplateType.lim};
+        if (followedByParen && calculus.containsKey(fname)) {
+          final close = _matchingParen(text, j);
+          final args = close > 0 ? _splitArgs(text.substring(j + 1, close)) : const <String>[];
+          final t = calculus[fname];
+          final okArity = (t == TemplateType.deriv || t == TemplateType.lim) ? args.length == 3 : args.length == 4;
+          if (t != null && okArity && args[1].trim() == 'x') {
+            // Slot order follows the template layout.
+            final slots = switch (t) {
+              TemplateType.deriv => [args[0], args[2]],
+              TemplateType.lim => [args[2], args[0]],
+              _ => [args[2], args[3], args[0]],
+            };
+            final g = _tokenizeGroup++;
+            out.add(EdToken.open(t, g));
+            for (var s = 0; s < slots.length; s++) {
+              if (s > 0) out.add(EdToken.sep(t, g, s));
+              out.addAll(tokenizeText(slots[s].trim()));
+            }
+            out.add(EdToken.close(t, g));
+            i = close + 1;
+            continue;
+          }
+        }
+        if (followedByParen && templated.containsKey(fname)) {
+          final close = _matchingParen(text, j);
+          if (close > 0) {
+            final inner = text.substring(j + 1, close);
+            final t = templated[fname]!;
+            final g = _tokenizeGroup++;
+            out.add(EdToken.open(t, g));
+            if (t == TemplateType.root) {
+              out.add(const EdToken.text('3'));
+              out.add(EdToken.sep(t, g, 1));
+            }
+            out.addAll(tokenizeText(inner));
+            out.add(EdToken.close(t, g));
+            i = close + 1;
+            continue;
+          }
+        }
         if (followedByParen && functionIndex.containsKey(fname)) {
           out.add(EdToken.func(fname));
           i = j + 1;
@@ -414,6 +510,37 @@ class ExpressionEditor {
         }
         i = j;
         continue;
+      }
+      // x^2, x^-1, x^(n+1) → exponent template.
+      if (c == '^') {
+        var k = i + 1;
+        String? exponent;
+        var end = k;
+        if (k < text.length && text[k] == '(') {
+          final close = _matchingParen(text, k);
+          if (close > 0) {
+            exponent = text.substring(k + 1, close);
+            end = close + 1;
+          }
+        } else {
+          if (k < text.length && (text[k] == '-' || text[k] == '−')) k++;
+          var m = k;
+          while (m < text.length && RegExp(r'[0-9.A-Za-zπθ]').hasMatch(text[m])) {
+            m++;
+          }
+          if (m > k) {
+            exponent = text.substring(i + 1, m);
+            end = m;
+          }
+        }
+        if (exponent != null && exponent.trim().isNotEmpty) {
+          final g = _tokenizeGroup++;
+          out.add(EdToken.open(TemplateType.pow, g));
+          out.addAll(tokenizeText(exponent));
+          out.add(EdToken.close(TemplateType.pow, g));
+          i = end;
+          continue;
+        }
       }
       out.add(EdToken.text(switch (c) {
         '*' => '×',
