@@ -56,7 +56,7 @@ def draw_symbols(d, cx, cy, span, stroke):
     line((x - a, y - a), (x + a, y + a), WHITE)
     line((x - a, y + a), (x + a, y - a), WHITE)
     x, y = centre(1, 1)  # equals (accent)
-    gap = arm * 0.42
+    gap = arm * 0.58
     line((x - arm, y - gap), (x + arm, y - gap), ACCENT)
     line((x - arm, y + gap), (x + arm, y + gap), ACCENT)
 
@@ -135,6 +135,9 @@ def main():
 
     for scale, suffix in ((1, ""), (2, "@2x"), (3, "@3x")):
         full_icon(96 * scale).save(os.path.join(IOS_LAUNCH, f"LaunchImage{suffix}.png"))
+
+    # In-app copy of the icon (onboarding, About).
+    save(full_icon(512), os.path.join(ROOT, "assets", "icon", "app_icon.png"))
     print("icons generated")
 
 

@@ -537,7 +537,7 @@ class AboutScreen extends StatelessWidget {
       appBar: AppBar(title: Text(l.aboutTitle)),
       body: ListView(padding: const EdgeInsets.all(20), children: [
         Row(children: [
-          Icon(Icons.calculate, size: 48, color: Theme.of(context).colorScheme.primary),
+          Image.asset('assets/icon/app_icon.png', width: 56, height: 56, excludeFromSemantics: true),
           const SizedBox(width: 16),
           Expanded(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -560,7 +560,12 @@ class AboutScreen extends StatelessWidget {
         OutlinedButton.icon(
           icon: const Icon(Icons.description_outlined),
           label: Text(l.aboutLicenses),
-          onPressed: () => showLicensePage(context: context, applicationName: l.appTitle, applicationVersion: appVersion),
+          onPressed: () => showLicensePage(
+            context: context,
+            applicationName: l.appTitle,
+            applicationVersion: appVersion,
+            applicationIcon: Image.asset('assets/icon/app_icon.png', width: 64, height: 64),
+          ),
         ),
       ]),
     );

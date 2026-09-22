@@ -58,12 +58,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                 Padding(
                   padding: const EdgeInsets.all(32),
                   child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-                    Container(
-                      width: 96,
-                      height: 96,
-                      decoration: BoxDecoration(color: theme.colorScheme.primaryContainer, borderRadius: BorderRadius.circular(28)),
-                      child: Icon(Icons.calculate, size: 56, color: theme.colorScheme.onPrimaryContainer),
-                    ),
+                    Image.asset('assets/icon/app_icon.png', width: 112, height: 112, excludeFromSemantics: true),
                     const SizedBox(height: 28),
                     Text(l.appTitle, style: theme.textTheme.headlineMedium, textAlign: TextAlign.center),
                     const SizedBox(height: 12),
